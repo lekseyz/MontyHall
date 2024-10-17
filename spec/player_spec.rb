@@ -1,53 +1,50 @@
 require 'rspec'
-require_relative '../lib/player'
+require_relative '../lib/player/base_player'
+require_relative '../lib/player/stay_player'
+require_relative '../lib/player/switch_player'
 
-RSpec.describe Player do
+RSpec.describe SwitchPlayer do
   describe "#first_guess" do
-    it "should return guess between 0 and 2 for :stay" do
-      player = Player.new(:stay)
+    it "should return guess between 0 and n for switch strategy" do
+      n = rand(100)
+      player = SwitchPlayer.new(n)
       guess = player.first_guess
 
-      expect(guess).to be_between(0, 2)
-    end
-
-    it "should return guess between 0 and 2 for :switch" do
-      player = Player.new(:switch)
-      guess = player.first_guess
-
-      expect(guess).to be_between(0, 2)
-    end
-
-    it "should return guess between 0 and 2 for unknown strategy" do
-      player = Player.new(:any_other_symbol)
-      guess = player.first_guess
-
-      expect(guess).to be_between(0, 2)
+      expect(guess).to be_between(0, n)
     end
   end
 
   describe "#second_guess" do
-    it "should return same guess for :stay" do
-      player = Player.new(:stay)
+    it "should return other guess for switch strategy" do
+      n = rand(100)
+      player = SwitchPlayer.new(n)
       guess = player.first_guess
-      second_guess = player.second_guess(guess, ((0..2).to_a - [guess]).sample)
-
-      expect(second_guess).to eq(guess)
-    end
-
-    it "should return other guess for :switch" do
-      player = Player.new(:switch)
-      guess = player.first_guess
-      second_guess = player.second_guess(guess, ((0..2).to_a - [guess]).sample)
+      second_guess = player.second_guess(((0..n).to_a - [guess]).sample)
 
       expect(second_guess).not_to eq(guess)
     end
+  end
+end
 
-    it "it should throw exception for unknown strategy" do
-      player = Player.new(:any_other_symbol)
+RSpec.describe StayPlayer do
+  describe "#first_guess" do
+    it "should return guess between 0 and n for stay strategy" do
+      n = rand(100)
+      player = StayPlayer.new(n)
       guess = player.first_guess
-      expect {
-        second_guess = player.second_guess(guess, ((0..2).to_a - [guess]).sample)
-      }.to raise_error(RuntimeError)
+
+      expect(guess).to be_between(0, n)
+    end
+  end
+
+  describe "#second_guess" do
+    it "should return same guess for stay strategy" do
+      n = rand(100)
+      player = StayPlayer.new(n)
+      guess = player.first_guess
+      second_guess = player.second_guess(((0..n).to_a - [guess]).sample)
+
+      expect(second_guess).to eq(guess)
     end
   end
 end
