@@ -1,20 +1,20 @@
+require 'player'
 class MHGame
-  def initialize
+  def initialize(player)
     @doors = Array.new(3, false)
     @win_door = rand(3)
     @doors[@win_door] = true
+    @player = player
   end
 
-  def play(change_choice)
-    choice = rand(3)
+  def play
+    guess = @player.first_guess
+    except_guess = (0..2).to_a - [guess]
 
-    rest_doors = (0..2).to_a - [choice]
-    opened = rest_doors.shuffle.find {|el| !@doors[el] }
+    other_variant = guess == @win_door ? except_guess.sample : @win_door
 
-    if change_choice
-      choice = (rest_doors - [opened]).first
-    end
+    guess = @player.second_guess(guess, other_variant)
 
-    return @doors[choice]
+    @doors[guess]
   end
 end
